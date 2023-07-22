@@ -1,9 +1,5 @@
-import ImageGallery from './ImageGallery/ImageGallery';
+import PixabayGallery from './PixabayGallery/PixabayGallery';
 
 export const App = () => {
-  return (
-    <div>
-      <ImageGallery />
-    </div>
-  );
+  return <PixabayGallery />;
 };
