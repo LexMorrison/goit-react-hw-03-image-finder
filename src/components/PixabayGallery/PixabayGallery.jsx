@@ -1,14 +1,18 @@
 import React from 'react';
+import Notiflix from 'notiflix';
 import { getImages } from 'components/API services/ApiService';
 import SearchBar from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { LoadMoreButton } from './Button/Button';
+import { Loader } from './Loader/Loader';
 
 class PixabayGallery extends React.Component {
   state = {
     search: '',
     page: 1,
+    totalPages: 0,
     arrayImages: [],
+    loader: false,
   };
   componentDidUpdate(prevProps, prevState) {
     if (
@@ -38,21 +42,33 @@ class PixabayGallery extends React.Component {
   fetchImages = async () => {
     const { search, page } = this.state;
     try {
+      this.setState({ loader: true });
+
       const data = await getImages(search, page);
 
       const dataValuable = this.imagesNormalize(data.hits);
       this.setState(prevState => ({
         arrayImages: [...prevState.arrayImages, ...dataValuable],
+        totalPages: Math.ceil(data.totalHits / 12),
       }));
-    } catch {}
+    } catch {
+      Notiflix.Notify.failure('Oops..., Somthing went wrong!');
+    } finally {
+      this.setState({ loader: false });
+    }
   };
 
   render() {
+    const { arrayImages, totalPages, page, loader } = this.state;
     return (
       <div>
         <SearchBar onSubmit={this.handleFormSubmit} />
-        <ImageGallery images={this.state.arrayImages} />
-        <LoadMoreButton onClick={this.LoadMore} />
+        {loader && <Loader />}
+
+        <ImageGallery images={arrayImages} />
+        {arrayImages.length > 0 && totalPages !== page && !loader && (
+          <LoadMoreButton onClick={this.LoadMore} />
+        )}
       </div>
     );
   }
