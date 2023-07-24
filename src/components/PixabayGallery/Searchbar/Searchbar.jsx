@@ -1,4 +1,5 @@
 import React from 'react';
+import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 import { AiOutlineSearch } from 'react-icons/ai';
 
@@ -19,6 +20,10 @@ class SearchBar extends React.Component {
 
   handleSubmit = evt => {
     evt.preventDefault();
+    const { search } = this.state;
+    if (search.trim() === '') {
+      return Notiflix.Notify.warning('Please, type something!');
+    }
     this.props.onSubmit(this.state.search);
     this.setState({ search: '' });
   };
